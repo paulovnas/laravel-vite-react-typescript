@@ -1,4 +1,3 @@
-import './bootstrap';
 import '../css/app.css';
 
 import { createRoot } from 'react-dom/client';
@@ -8,7 +7,7 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { StrictMode } from 'react';
 
 
-const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel - Vite + React + Typescript';
+const appName = window.document.getElementsByTagName('title')[0]?.innerText || '';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
