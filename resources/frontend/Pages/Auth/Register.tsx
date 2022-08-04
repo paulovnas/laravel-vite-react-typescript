@@ -1,125 +1,88 @@
-import React, { useEffect } from 'react';
-import Button from '../../../Components/Button';
+import { useState } from 'react';
+import {
+    createStyles,
+    TextInput,
+    PasswordInput,
+    Button,
+    Group,
+    Anchor,
+    Center,
+    Box
+  } from '@mantine/core';
+import { IconArrowLeft } from '@tabler/icons';
 import Guest from '../../Layouts/Guest';
-import Input from '../../../Components/Input';
-import Label from '../../../Components/Label';
-import ValidationErrors from '../../../Components/ValidationErrors';
-import { Head, Link, useForm } from '@inertiajs/inertia-react';
+import { Head } from '@inertiajs/inertia-react';
+import { useForm } from '@mantine/form';
+import { Inertia } from '@inertiajs/inertia';
+import Toast from '../../../components/Toast';
+import { AuthStyles } from './Styles';
 
-export default function Register() {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        name: '',
-        nickname: '',
-        email: '',
-        password: '',
-        password_confirmation: '',
+const Register = ()  => {
+    const { classes } = AuthStyles();
+    const [loading, setLoading] = useState(false);
+    const form = useForm({
+        initialValues: {
+            name: '',
+            nickname: '',
+            email: '',
+            password: '',
+            password_confirmation: '',
+        },
+    
+        validate: {
+            name: (value) => (value.length >= 5 ? null : 'Mínimo de 5 caracteres'),
+            nickname: (value) => (value.length >= 2 ? null : 'Mínimo de 2 caracteres'),
+            email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Email inválido'),
+            password: (value) => (value.length >= 4 ? null : 'Mínimo de 4 caracteres'),
+            password_confirmation: (value, values) => (value === values.password ? null : 'Senhas não coincidem'),
+        },
     });
 
-    useEffect(() => {
-        return () => {
-            reset('password', 'password_confirmation');
-        };
-    }, []);
-
-    const onHandleChange = (event : any) => {
-        setData(event.target.name, event.target.type === 'checkbox' ? event.target.checked : event.target.value);
-    };
-
-    const submit = (e:React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
-        post('/register');
+    const submit = () => {
+        setLoading(true);
+        Inertia.post('/register', 
+        form.values, {
+            onError: (a) => {
+                Toast('error', a.message ? a.message : JSON.stringify(a));
+                setLoading(false);
+            }
+        });
     };
 
     return (
-        <Guest>
+        <Guest title='Registrar-se' subtitle="Registre-se para continuar">
             <>
                 <Head title="Registrar-se" />
 
-                <ValidationErrors errors={errors} />
+                <form onSubmit={form.onSubmit(submit)}>
+                    <TextInput mb={8} label="Nome Completo" placeholder="Seu lindo nome aqui" 
+                    required {...form.getInputProps('name')}/>
 
-                <form onSubmit={submit}>
-                    <div>
-                        <Label forInput="name" value="Nome" />
+                    <TextInput mb={8} label="Apelido" placeholder="Como devemos te chamar?" 
+                    required {...form.getInputProps('nickname')}/>
 
-                        <Input
-                            type="text"
-                            name="name"
-                            value={data.name}
-                            className="mt-1 block w-full"
-                            autoComplete="name"
-                            isFocused={true}
-                            handleChange={onHandleChange}
-                            required
-                        />
-                    </div>
+                    <TextInput mb={8} label="Email" placeholder="seu@email.com" 
+                    required {...form.getInputProps('email')}/>
 
-                    <div>
-                        <Label forInput="nickname" value="Apelido" />
+                    <PasswordInput mb={8} label="Senha" placeholder="Digite uma senha" 
+                    required {...form.getInputProps('password')}/>
 
-                        <Input
-                            type="text"
-                            name="nickname"
-                            value={data.nickname}
-                            className="mt-1 block w-full"
-                            autoComplete="nickname"
-                            handleChange={onHandleChange}
-                            required
-                        />
-                    </div>
+                    <PasswordInput mb={8} label="Confirmar Senha" placeholder="Só por garantia ;)" 
+                    required {...form.getInputProps('password_confirmation')}/>
 
-                    <div className="mt-4">
-                        <Label forInput="email" value="Email" />
-
-                        <Input
-                            type="email"
-                            name="email"
-                            value={data.email}
-                            className="mt-1 block w-full"
-                            autoComplete="username"
-                            handleChange={onHandleChange}
-                            required
-                        />
-                    </div>
-
-                    <div className="mt-4">
-                        <Label forInput="password" value="Senha" />
-
-                        <Input
-                            type="password"
-                            name="password"
-                            value={data.password}
-                            className="mt-1 block w-full"
-                            autoComplete="new-password"
-                            handleChange={onHandleChange}
-                            required
-                        />
-                    </div>
-
-                    <div className="mt-4">
-                        <Label forInput="password_confirmation" value="Confirmar Senha" />
-
-                        <Input
-                            type="password"
-                            name="password_confirmation"
-                            value={data.password_confirmation}
-                            className="mt-1 block w-full"
-                            handleChange={onHandleChange}
-                            required
-                        />
-                    </div>
-
-                    <div className="flex items-center justify-end mt-4">
-                        <Link href='/login' className="underline text-sm text-gray-600 hover:text-gray-900">
-                            Ja é registrado?
-                        </Link>
-
-                        <Button className="ml-4" processing={processing}>
-                            Registrar
-                        </Button>
-                    </div>
+                    <Group mb={8} position="apart" mt="lg" className={classes.controls}>
+                        <Anchor<'a'> href="/login" color="dimmed" size="sm" className={classes.control}>
+                            <Center inline>
+                                <IconArrowLeft size={12} stroke={1.5} />
+                                <Box ml={5}>Ja sou registrado...</Box>
+                            </Center>
+                        </Anchor>
+                        <Button type='submit' loading={loading} className={classes.control}>Registrar</Button>
+                    </Group>
                 </form>
             </>
         </Guest>
     );
 }
+
+export default Register;

@@ -1,64 +1,68 @@
-import React, { useEffect } from 'react';
-import Button from '../../../Components/Button';
+import { useState } from 'react';
+import {
+    createStyles,
+    Text,
+    PasswordInput,
+    Button,
+    Group,
+    Anchor,
+    Center,
+    Box
+  } from '@mantine/core';
+import { IconArrowLeft } from '@tabler/icons';
 import Guest from '../../Layouts/Guest';
-import Input from '../../..//Components/Input';
-import Label from '../../..//Components/Label';
-import ValidationErrors from '../../..//Components/ValidationErrors';
-import { Head, useForm } from '@inertiajs/inertia-react';
+import { Head } from '@inertiajs/inertia-react';
+import { Inertia } from '@inertiajs/inertia';
+import { useForm } from '@mantine/form';
+import Toast from '../../../components/Toast';
+import { AuthStyles } from './Styles';
 
-export default function ConfirmPassword() {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        password: '',
+const ConfirmPassword = () => {
+    const { classes } = AuthStyles();
+    const [loading, setLoading] = useState(false);
+    const form = useForm({
+        initialValues: {
+          password: '',
+        },
     });
 
-    useEffect(() => {
-        return () => {
-            reset('password');
-        };
-    }, []);
-
-    const onHandleChange = (event: any) => {
-        setData(event.target.name, event.target.value);
-    };
-
-    const submit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
-        post('/confirm-password');
+    const submit = () => {
+        setLoading(true);
+        Inertia.post('/confirm-password', 
+        form.values, {
+            onError: (a) => {
+                Toast('error', "Senha incorreta");
+                setLoading(false);
+            }
+        });
     };
 
     return (
-        <Guest>
+        <Guest title="Atenção" subtitle="Confirmação necessária">
             <>
                 <Head title="Confirmar Senha" />
 
-                <div className="mb-4 text-sm text-gray-600">
+                <Text>
                     Esta é uma área segura do aplicativo. Confirme sua senha antes de continuar.
-                </div>
+                </Text>
 
-                <ValidationErrors errors={errors}/>
+                <form onSubmit={form.onSubmit(submit)}>
+                    <PasswordInput label="Senha" placeholder="Digite sua senha" 
+                    required mt="md" {...form.getInputProps('password')}/>
 
-                <form onSubmit={submit}>
-                    <div className="mt-4">
-                        <Label forInput="password" value="Senha" />
-
-                        <Input
-                            type="password"
-                            name="password"
-                            value={data.password}
-                            className="mt-1 block w-full"
-                            isFocused={true}
-                            handleChange={onHandleChange}
-                        />
-                    </div>
-
-                    <div className="flex items-center justify-end mt-4">
-                        <Button className="ml-4" processing={processing}>
-                            Confirmar
-                        </Button>
-                    </div>
+                    <Group mb={8} position="apart" mt="lg" className={classes.controls}>
+                        <Anchor<'a'> href="/login" color="dimmed" size="sm" className={classes.control}>
+                            <Center inline>
+                                <IconArrowLeft size={12} stroke={1.5} />
+                                <Box ml={5}>Cancelar</Box>
+                            </Center>
+                        </Anchor>
+                        <Button type='submit' loading={loading} className={classes.control}>Continuar</Button>
+                    </Group>
                 </form>
             </>
         </Guest>
     );
 }
+
+export default ConfirmPassword;

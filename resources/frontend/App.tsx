@@ -1,10 +1,10 @@
-import '../css/app.css';
-
 import { createRoot } from 'react-dom/client';
 import { createInertiaApp } from '@inertiajs/inertia-react';
 import { InertiaProgress } from '@inertiajs/progress';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { StrictMode } from 'react';
+import { MantineProvider } from '@mantine/core';
+import { NotificationsProvider } from '@mantine/notifications';
 
 
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || '';
@@ -15,7 +15,11 @@ createInertiaApp({
     setup({ el, App, props }) {
         return createRoot(el).render(
             <StrictMode>
-                <App {...props} />
+                <MantineProvider withGlobalStyles withNormalizeCSS>
+                    <NotificationsProvider>
+                        <App {...props} />
+                    </NotificationsProvider>
+                </MantineProvider>
               </StrictMode>
             );
     },

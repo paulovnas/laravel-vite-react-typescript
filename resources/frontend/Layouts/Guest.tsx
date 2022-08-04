@@ -1,23 +1,35 @@
-import { Link } from '@inertiajs/inertia-react';
-import ApplicationLogo from '../../Components/ApplicationLogo';
+import { Paper, Container, Title, Text } from '@mantine/core';
 
 interface IChildren {
+    title: string,
+    subtitle: JSX.Element | string,
     children: JSX.Element
 }
 
-const Guest = ({ children } : IChildren) => {
-    return (
-        <div className="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100">
-            <div>
-                <Link href="/">
-                <ApplicationLogo className="w-20 h-20 fill-current text-gray-500" />
-                </Link>
-            </div>
+const Guest = ({ children, title, subtitle } : IChildren) => {
+    const getSubTitle = () => {
+        if (typeof subtitle === "string") {
+            return <Text color="dimmed" size="sm" align="center" mt={5}>
+                {subtitle}
+            </Text>
+        } else {
+            return subtitle;
+        }
+    }
 
-            <div className="w-full sm:max-w-md mt-6 px-6 py-4 bg-white shadow-md overflow-hidden sm:rounded-lg">
+    return (
+        <Container size={420} my={40}>
+            <Title
+                align="center"
+                sx={(theme) => ({ fontFamily: `Greycliff CF, ${theme.fontFamily}`, fontWeight: 900, fontSize: 26 })}
+            >
+                {title}
+            </Title>
+            {getSubTitle()}
+            <Paper withBorder shadow="md" p={30} mt={30} radius="md">
                 {children}
-            </div>
-        </div>
+            </Paper>
+        </Container>
     );
 }
 

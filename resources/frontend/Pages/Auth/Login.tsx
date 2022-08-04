@@ -1,11 +1,18 @@
-import React, { useEffect } from 'react';
-import Button from '../../../Components/Button';
-import Checkbox from '../../../Components/Checkbox';
+import {
+    TextInput,
+    PasswordInput,
+    Anchor,
+    Text,
+    Group,
+    Checkbox,
+    Button
+} from '@mantine/core';
+import { useForm } from '@mantine/form';
+import { Inertia } from '@inertiajs/inertia';
+import { Head } from '@inertiajs/inertia-react';
+import Toast from '../../../components/Toast';
+import { useState } from 'react';
 import Guest from '../../Layouts/Guest';
-import Input from '../../../Components/Input';
-import Label from '../../../Components/Label';
-import ValidationErrors from '../../../Components/ValidationErrors';
-import { Head, Link, useForm } from '@inertiajs/inertia-react';
 
 interface ILogin {
     status: any,
@@ -13,87 +20,70 @@ interface ILogin {
 }
 
 const Login = ({ status, canResetPassword } : ILogin) => {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        email: '',
-        password: '',
-        remember: '',
+    const [loading, setLoading] = useState(false);
+    const form = useForm({
+        initialValues: {
+          email: '',
+          password: '',
+          remember: false,
+        },
+    
+        validate: {
+          email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Email inválido!'),
+        },
     });
 
-    useEffect(() => {
-        return () => {
-            reset('password');
-        };
-    }, []);
-
-    const onHandleChange = (event : any) => {
-        setData(event.target.name, event.target.type === 'checkbox' ? event.target.checked : event.target.value);
+    const submit = () => {
+        setLoading(true);
+        Inertia.post('/login', 
+        form.values, {
+            onError: (a) => {
+                Toast('error', a.message);
+                setLoading(false);
+            }
+        });
     };
 
-    const submit = (e: any) => {
-        e.preventDefault();
-
-        post('/login');
-    };
+    const sub = () => {
+        return <Text color="dimmed" size="sm" align="center" mt={5}>
+            Ainda não tem uma conta?{' '}
+            <Anchor<'a'> href="/register" size="sm">
+                Criar conta
+            </Anchor>
+        </Text>
+    }
 
     return (
-        <Guest>
+        <Guest title='Bem vindo(a) de volta!' subtitle={sub()}>
             <>
-            <Head title="Entrar" />
+                <Head title="Entrar" />
+                {status && Toast("info", status)}
 
-            {status && <div className="mb-4 font-medium text-sm text-green-600">{status}</div>}
+                <form onSubmit={form.onSubmit(submit)}>
 
-            <ValidationErrors errors={errors} />
-
-            <form onSubmit={submit}>
-                <div>
-                    <Label forInput="email" value="Email" />
-
-                    <Input
-                        type="text"
-                        name="email"
-                        value={data.email}
-                        className="mt-1 block w-full"
-                        autoComplete="email"
-                        isFocused={true}
-                        handleChange={onHandleChange}
+                    <TextInput
+                    required
+                    label="Email"
+                    placeholder="seu@email.com"
+                    {...form.getInputProps('email')}
                     />
-                </div>
 
-                <div className="mt-4">
-                    <Label forInput="password" value="Senha" />
-
-                    <Input
-                        type="password"
-                        name="password"
-                        value={data.password}
-                        className="mt-1 block w-full"
-                        handleChange={onHandleChange}
-                    />
-                </div>
-
-                <div className="block mt-4">
-                    <label className="flex items-center">
-                        <Checkbox name="remember" value={data.remember} handleChange={onHandleChange} />
-
-                        <span className="ml-2 text-sm text-gray-600">Lembrar-me</span>
-                    </label>
-                </div>
-
-                <div className="flex items-center justify-end mt-4">
-                    {canResetPassword && (
-                        <Link
-                            href={'/forgot-password'}
-                            className="underline text-sm text-gray-600 hover:text-gray-900"
-                        >
+                    <PasswordInput label="Senha" placeholder="Digite sua senha" 
+                    required mt="md" {...form.getInputProps('password')}/>
+                    
+                    <Group position="apart" mt="md">
+                        <Checkbox label="Lembrar-me" {
+                            ...form.getInputProps('remember', { type: 'checkbox' })
+                        } />
+                        {canResetPassword && (<Anchor<'a'> href="/forgot-password" size="sm">
                             Esqueceu sua senha?
-                        </Link>
-                    )}
+                        </Anchor>)}
+                    </Group>
 
-                    <Button className="ml-4" processing={processing}>
+                    <Button loading={loading} type='submit' fullWidth mt="xl">
                         Entrar
                     </Button>
-                </div>
-            </form>
+                </form>
             </>
         </Guest>
     );

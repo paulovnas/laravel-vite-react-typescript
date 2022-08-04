@@ -1,93 +1,62 @@
-import React, { useEffect } from 'react';
-import Button from '../../../Components/Button';
+import { useState } from 'react';
+import { TextInput, PasswordInput, Button } from '@mantine/core';
 import Guest from '../../Layouts/Guest';
-import Input from '../../../Components/Input';
-import Label from '../../../Components/Label';
-import ValidationErrors from '../../../Components/ValidationErrors';
-import { Head, useForm } from '@inertiajs/inertia-react';
+import { Head } from '@inertiajs/inertia-react';
+import { useForm } from '@mantine/form';
+import { Inertia } from '@inertiajs/inertia';
+import Toast from '../../../components/Toast';
 
 interface IReset {
     token: string,
     email: string
 }
 
-export default function ResetPassword({ token, email } : IReset) {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        token: token,
-        email: email,
-        password: '',
-        password_confirmation: '',
+const ResetPassword = ({ token, email } : IReset) => {
+    const [loading, setLoading] = useState(false);
+    const form = useForm({
+        initialValues: {
+            token: token,
+            email: email,
+            password: '',
+            password_confirmation: '',
+        },
+    
+        validate: {
+            email: (value) => (/^\S+@\S+$/.test(value) ? null : 'Email inválido'),
+            password: (value) => (value.length >= 4 ? null : 'Mínimo de 4 caracteres'),
+            password_confirmation: (value, values) => (value === values.password ? null : 'Senhas não coincidem'),
+        },
     });
 
-    useEffect(() => {
-        return () => {
-            reset('password', 'password_confirmation');
-        };
-    }, []);
-
-    const onHandleChange = (event: any) => {
-        setData(event.target.name, event.target.value);
-    };
-
-    const submit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
-        post('/reset-password');
+    const submit = () => {
+        setLoading(true);
+        Inertia.post('/reset-password', 
+        form.values, {
+            onError: (a) => {
+                Toast('error', a.message ? a.message : JSON.stringify(a));
+                setLoading(false);
+            }
+        });
     };
 
     return (
-        <Guest>
+        <Guest title="Redefinir Senha" subtitle="Atenção aos detalhes!">
             <>
                 <Head title="Redefinir Senha" />
 
-                <ValidationErrors errors={errors} />
+                <form onSubmit={form.onSubmit(submit)}>
+                    <TextInput mb={8} label="Email" placeholder="seu@email.com" 
+                    required {...form.getInputProps('email')}/>
 
-                <form onSubmit={submit}>
-                    <div>
-                        <Label forInput="email" value="Email" />
+                    <PasswordInput mb={8} label="Senha" placeholder="Digite sua nova senha" 
+                    required {...form.getInputProps('password')}/>
 
-                        <Input
-                            type="email"
-                            name="email"
-                            value={data.email}
-                            className="mt-1 block w-full"
-                            autoComplete="username"
-                            handleChange={onHandleChange}
-                        />
-                    </div>
+                    <PasswordInput mb={8} label="Confirmar Senha" placeholder="Por garantia ;)" 
+                    required {...form.getInputProps('password_confirmation')}/>
 
-                    <div className="mt-4">
-                        <Label forInput="password" value="Senha" />
-
-                        <Input
-                            type="password"
-                            name="password"
-                            value={data.password}
-                            className="mt-1 block w-full"
-                            autoComplete="new-password"
-                            isFocused={true}
-                            handleChange={onHandleChange}
-                        />
-                    </div>
-
-                    <div className="mt-4">
-                        <Label forInput="password_confirmation" value="Confirmar Senha" />
-
-                        <Input
-                            type="password"
-                            name="password_confirmation"
-                            value={data.password_confirmation}
-                            className="mt-1 block w-full"
-                            autoComplete="new-password"
-                            handleChange={onHandleChange}
-                        />
-                    </div>
-
-                    <div className="flex items-center justify-end mt-4">
-                        <Button className="ml-4" processing={processing}>
-                            Redefinir
-                        </Button>
-                    </div>
+                    <Button loading={loading} type='submit' fullWidth mt="xl">
+                        Redefinir
+                    </Button>
                 </form>
             </>
         </Guest>
