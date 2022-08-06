@@ -1,7 +1,5 @@
 # Estrutura base
-[![laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=ffffff)](https://laravel.com/) [![vite](https://img.shields.io/badge/Vite-593D88?style=for-the-badge&logo=vite&logoColor=ffffff)](https://vitejs.dev/config/) [![react](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://pt-br.reactjs.org/) [![tailwindcss](https://img.shields.io/badge/tailwindcss-38BDF8?style=for-the-badge&logo=tailwindcss&logoColor=white
-)](https://tailwindcss.com/) [![inertiajs](https://img.shields.io/badge/inertiajs-8F61EC?style=for-the-badge&logo=plex&logoColor=white
-)](https://inertiajs.com/) [![mantine](https://img.shields.io/badge/mantine-339AF0?style=for-the-badge&logo=mantine&logoColor=white
+[![laravel](https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=ffffff)](https://laravel.com/) [![vite](https://img.shields.io/badge/Vite-593D88?style=for-the-badge&logo=vite&logoColor=ffffff)](https://vitejs.dev/config/) [![react](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://pt-br.reactjs.org/) [![inertiajs](https://img.shields.io/badge/inertiajs-8F61EC?style=for-the-badge&logo=plex&logoColor=white)](https://inertiajs.com/) [![mantine](https://img.shields.io/badge/mantine-339AF0?style=for-the-badge&logo=mantine&logoColor=white
 )](https://mantine.dev/)
 
  Uma estrutura para usar como base em projetos utilizando as tecnologias descritas acima!
