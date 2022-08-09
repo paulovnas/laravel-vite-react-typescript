@@ -1,5 +1,5 @@
 import { IUser } from "./Models";
 
 export interface IAuth {
-    user: IUser
+    user: IUser;
 }

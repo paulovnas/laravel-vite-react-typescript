@@ -1,10 +1,10 @@
-import { showNotification } from '@mantine/notifications';
-import { MantineColor } from '@mantine/styles';
+import { showNotification } from "@mantine/notifications";
+import { MantineColor } from "@mantine/styles";
 
-type messageTypes = 'success' | 'warning' | 'error' | 'info';
+type messageTypes = "success" | "warning" | "error" | "info";
 
 const Toast = (type: messageTypes, message: string) => {
-    let color : MantineColor = "blue";
+    let color: MantineColor = "blue";
 
     switch (type) {
         case "success":
